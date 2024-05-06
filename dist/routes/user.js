@@ -19,6 +19,37 @@ const catchError_1 = require("../utils/catchError");
 const user_1 = require("../models/user");
 const router = express_1.default.Router();
 exports.router = router;
+router.post("/login", (0, catchError_1.catchError)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { username, password } = req.body;
+    if (!username) {
+        throw new ApiError_1.ApiError(400, "Username is required");
+    }
+    const user = yield user_1.User.findOne({ username });
+    if (!user) {
+        throw new ApiError_1.ApiError(400, "Invalid credentials");
+    }
+    const isValidPassword = yield user.isValidPassword(password);
+    if (!isValidPassword) {
+        throw new ApiError_1.ApiError(400, "Invalid credentials");
+    }
+    res.status(200).json({ success: true, message: "User logged in" });
+})));
+router.post("/signup", (0, catchError_1.catchError)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { username, password } = req.body;
+    if (!username) {
+        throw new ApiError_1.ApiError(400, "Username is required");
+    }
+    const user = yield user_1.User.findOne({ username });
+    if (user) {
+        throw new ApiError_1.ApiError(400, "Username already taken. Choose something else.");
+    }
+    const newUser = yield user_1.User.create({ username, password });
+    res.status(200).json({
+        success: true,
+        message: "Account created successfully",
+        user: newUser,
+    });
+})));
 router.get("/:id", (0, catchError_1.catchError)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const user = yield user_1.User.findById(id);

@@ -7,8 +7,9 @@ const express_1 = __importDefault(require("express"));
 const db_1 = require("./db");
 const user_1 = require("./routes/user");
 const post_1 = require("./routes/post");
-const app = (0, express_1.default)();
 const PORT = process.env.PORT || 3000;
+const app = (0, express_1.default)();
+app.use(express_1.default.json());
 app.get("/", (req, res) => {
     res.json({ success: true, message: "Server online" });
 });

@@ -5,9 +5,10 @@ import { ApiError } from "./utils/ApiError";
 import { router as userRouter } from "./routes/user";
 import { router as postRouter } from "./routes/post";
 
-const app = express();
-
 const PORT = process.env.PORT || 3000;
+
+const app = express();
+app.use(express.json());
 
 app.get("/", (req: Request, res: Response) => {
     res.json({ success: true, message: "Server online" });
