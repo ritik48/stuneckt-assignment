@@ -20,7 +20,7 @@ const user_1 = require("../models/user");
 const router = express_1.default.Router();
 exports.router = router;
 router.post("/login", (0, catchError_1.catchError)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { username, password } = req.body;
+    const { username, password, } = req.body;
     if (!username) {
         throw new ApiError_1.ApiError(400, "Username is required");
     }
@@ -35,7 +35,7 @@ router.post("/login", (0, catchError_1.catchError)((req, res, next) => __awaiter
     res.status(200).json({ success: true, message: "User logged in" });
 })));
 router.post("/signup", (0, catchError_1.catchError)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { username, password } = req.body;
+    const { username, password, } = req.body;
     if (!username) {
         throw new ApiError_1.ApiError(400, "Username is required");
     }
@@ -49,6 +49,10 @@ router.post("/signup", (0, catchError_1.catchError)((req, res, next) => __awaite
         message: "Account created successfully",
         user: newUser,
     });
+})));
+router.get("/", (0, catchError_1.catchError)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield user_1.User.findById(req.user).select("-password");
+    res.status(200).json({ status: true, user });
 })));
 router.get("/:id", (0, catchError_1.catchError)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;

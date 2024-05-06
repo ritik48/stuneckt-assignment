@@ -1,9 +1,10 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Response } from "express";
+import { CustomRequest } from "../types";
 
 export const catchError = (
-    fn: (req: Request, res: Response, next: NextFunction) => Promise<void>
+    fn: (req: CustomRequest, res: Response, next: NextFunction) => Promise<void>
 ) => {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req: CustomRequest, res: Response, next: NextFunction) => {
         try {
             await fn(req, res, next);
         } catch (error) {
