@@ -51,6 +51,9 @@ router.post("/signup", (0, catchError_1.catchError)((req, res, next) => __awaite
     });
 })));
 router.get("/", (0, catchError_1.catchError)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!req.user) {
+        throw new ApiError_1.ApiError(400, "You are not authenticated.");
+    }
     const user = yield user_1.User.findById(req.user).select("-password");
     res.status(200).json({ status: true, user });
 })));

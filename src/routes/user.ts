@@ -70,6 +70,9 @@ router.get(
     "/",
     catchError(
         async (req: CustomRequest, res: Response, next: NextFunction) => {
+            if (!req.user) {
+                throw new ApiError(400, "You are not authenticated.");
+            }
             const user = await User.findById(req.user).select("-password");
             res.status(200).json({ status: true, user });
         }
