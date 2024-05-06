@@ -5,18 +5,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const db_1 = require("./db");
+const user_1 = require("./routes/user");
+const post_1 = require("./routes/post");
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 3000;
 app.get("/", (req, res) => {
-    throw new AppError(400, "wef");
     res.json({ success: true, message: "Server online" });
 });
-class AppError extends Error {
-    constructor(status, message) {
-        super(message);
-        this.status = status;
-    }
-}
+app.use("/user", user_1.router);
+app.use("/post", post_1.router);
 app.use((err, req, res, next) => {
     const { message, status = 500 } = err;
     res.status(status).json({ success: false, message });
