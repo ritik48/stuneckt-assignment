@@ -1,4 +1,5 @@
 import express, { NextFunction, Request, Response } from "express";
+import cookieParser from "cookie-parser";
 
 import { connectDb } from "./db";
 import { ApiError } from "./utils/ApiError";
@@ -6,9 +7,11 @@ import { router as userRouter } from "./routes/user";
 import { router as postRouter } from "./routes/post";
 
 const PORT = process.env.PORT || 3000;
+const COOKIE_SECRET = process.env.COOKIE_SECRET || "cookiesecret";
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser(COOKIE_SECRET));
 
 app.get("/", (req: Request, res: Response) => {
     res.json({ success: true, message: "Server online" });

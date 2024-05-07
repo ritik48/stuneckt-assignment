@@ -17,6 +17,9 @@ const express_1 = __importDefault(require("express"));
 const ApiError_1 = require("../utils/ApiError");
 const catchError_1 = require("../utils/catchError");
 const user_1 = require("../models/user");
+const auth_1 = require("../utils/auth");
+const jsonwebtoken_1 = require("jsonwebtoken");
+const JWT_SECRET = process.env.JWT_SECRET || "jwtsecret";
 const router = express_1.default.Router();
 exports.router = router;
 router.post("/login", (0, catchError_1.catchError)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -32,6 +35,8 @@ router.post("/login", (0, catchError_1.catchError)((req, res, next) => __awaiter
     if (!isValidPassword) {
         throw new ApiError_1.ApiError(400, "Invalid credentials");
     }
+    const jwtToken = (0, auth_1.generateJWTToken)(user._id);
+    res.cookie("jwt", jwtToken);
     res.status(200).json({ success: true, message: "User logged in" });
 })));
 router.post("/signup", (0, catchError_1.catchError)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -51,10 +56,24 @@ router.post("/signup", (0, catchError_1.catchError)((req, res, next) => __awaite
     });
 })));
 router.get("/", (0, catchError_1.catchError)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!req.user) {
-        throw new ApiError_1.ApiError(400, "You are not authenticated.");
+    // check if cookie is present in the request
+    const cookie = req.cookies.jwt;
+    if (!cookie) {
+        throw new ApiError_1.ApiError(401, "Not Authenticated");
     }
-    const user = yield user_1.User.findById(req.user).select("-password");
+    // verify the cookie and get the user Id
+    let decodedData;
+    try {
+        decodedData = (0, jsonwebtoken_1.verify)(cookie, JWT_SECRET);
+    }
+    catch (err) {
+        throw new ApiError_1.ApiError(401, "Token Expired. Please login again");
+        return;
+    }
+    const user = yield user_1.User.findById(decodedData.id).select("-password");
+    if (!user) {
+        throw new ApiError_1.ApiError(401, "Invalid Request. User does not exist");
+    }
     res.status(200).json({ status: true, user });
 })));
 router.get("/:id", (0, catchError_1.catchError)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {

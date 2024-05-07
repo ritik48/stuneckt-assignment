@@ -4,12 +4,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const db_1 = require("./db");
 const user_1 = require("./routes/user");
 const post_1 = require("./routes/post");
 const PORT = process.env.PORT || 3000;
+const COOKIE_SECRET = process.env.COOKIE_SECRET || "cookiesecret";
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
+app.use((0, cookie_parser_1.default)(COOKIE_SECRET));
 app.get("/", (req, res) => {
     res.json({ success: true, message: "Server online" });
 });

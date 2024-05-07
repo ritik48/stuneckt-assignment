@@ -4,6 +4,10 @@ import { CustomRequest } from "../types";
 import { ApiError } from "../utils/ApiError";
 import { catchError } from "../utils/catchError";
 import { User } from "../models/user";
+import { generateJWTToken } from "../utils/auth";
+import { JwtPayload, verify } from "jsonwebtoken";
+
+const JWT_SECRET = process.env.JWT_SECRET || "jwtsecret";
 
 const router = express.Router();
 
@@ -29,6 +33,9 @@ router.post(
                 throw new ApiError(400, "Invalid credentials");
             }
 
+            const jwtToken = generateJWTToken(user._id);
+
+            res.cookie("jwt", jwtToken);
             res.status(200).json({ success: true, message: "User logged in" });
         }
     )
@@ -70,10 +77,26 @@ router.get(
     "/",
     catchError(
         async (req: CustomRequest, res: Response, next: NextFunction) => {
-            if (!req.user) {
-                throw new ApiError(400, "You are not authenticated.");
+            // check if cookie is present in the request
+            const cookie = req.cookies.jwt;
+            if (!cookie) {
+                throw new ApiError(401, "Not Authenticated");
             }
-            const user = await User.findById(req.user).select("-password");
+
+            // verify the cookie and get the user Id
+            let decodedData: JwtPayload;
+            try {
+                decodedData = verify(cookie, JWT_SECRET) as JwtPayload;
+            } catch (err: any) {
+                throw new ApiError(401, "Token Expired. Please login again");
+                return;
+            }
+
+            const user = await User.findById(decodedData.id).select("-password");
+            if (!user) {
+                throw new ApiError(401, "Invalid Request. User does not exist");
+            }
+
             res.status(200).json({ status: true, user });
         }
     )
