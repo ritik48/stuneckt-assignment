@@ -4,7 +4,7 @@ import { CustomRequest } from "../types";
 import { ApiError } from "../utils/ApiError";
 import { catchError } from "../utils/catchError";
 import { User } from "../models/user";
-import { generateJWTToken } from "../utils/auth";
+import { generateJWTToken, isAuthenticated } from "../utils/auth";
 import { JwtPayload, verify } from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET || "jwtsecret";
@@ -75,29 +75,10 @@ router.post(
 
 router.get(
     "/",
+    catchError(isAuthenticated),
     catchError(
         async (req: CustomRequest, res: Response, next: NextFunction) => {
-            // check if cookie is present in the request
-            const cookie = req.cookies.jwt;
-            if (!cookie) {
-                throw new ApiError(401, "Not Authenticated");
-            }
-
-            // verify the cookie and get the user Id
-            let decodedData: JwtPayload;
-            try {
-                decodedData = verify(cookie, JWT_SECRET) as JwtPayload;
-            } catch (err: any) {
-                throw new ApiError(401, "Token Expired. Please login again");
-                return;
-            }
-
-            const user = await User.findById(decodedData.id).select("-password");
-            if (!user) {
-                throw new ApiError(401, "Invalid Request. User does not exist");
-            }
-
-            res.status(200).json({ status: true, user });
+            res.status(200).json({ status: true, user: req.user });
         }
     )
 );

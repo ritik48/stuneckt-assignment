@@ -18,7 +18,6 @@ const ApiError_1 = require("../utils/ApiError");
 const catchError_1 = require("../utils/catchError");
 const user_1 = require("../models/user");
 const auth_1 = require("../utils/auth");
-const jsonwebtoken_1 = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET || "jwtsecret";
 const router = express_1.default.Router();
 exports.router = router;
@@ -55,26 +54,8 @@ router.post("/signup", (0, catchError_1.catchError)((req, res, next) => __awaite
         user: newUser,
     });
 })));
-router.get("/", (0, catchError_1.catchError)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    // check if cookie is present in the request
-    const cookie = req.cookies.jwt;
-    if (!cookie) {
-        throw new ApiError_1.ApiError(401, "Not Authenticated");
-    }
-    // verify the cookie and get the user Id
-    let decodedData;
-    try {
-        decodedData = (0, jsonwebtoken_1.verify)(cookie, JWT_SECRET);
-    }
-    catch (err) {
-        throw new ApiError_1.ApiError(401, "Token Expired. Please login again");
-        return;
-    }
-    const user = yield user_1.User.findById(decodedData.id).select("-password");
-    if (!user) {
-        throw new ApiError_1.ApiError(401, "Invalid Request. User does not exist");
-    }
-    res.status(200).json({ status: true, user });
+router.get("/", (0, catchError_1.catchError)(auth_1.isAuthenticated), (0, catchError_1.catchError)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    res.status(200).json({ status: true, user: req.user });
 })));
 router.get("/:id", (0, catchError_1.catchError)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;

@@ -1,4 +1,5 @@
 import { Request } from "express";
+import { Document } from "mongoose";
 
 interface IUser {
     username: string;
@@ -7,7 +8,7 @@ interface IUser {
 
 // Custom Request to add user property in the Request after authentication
 interface CustomRequest extends Request {
-    user?: string;
+    user?: Document;
 }
 
 export { IUser, CustomRequest };
