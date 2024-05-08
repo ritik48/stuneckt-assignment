@@ -27,10 +27,8 @@ const userSchema = new Schema({
 
 // hash the password before saving the user
 userSchema.pre("save", async function (next) {
-    console.log("yes");
-
-   // If the password is not modified then return to avoid unnecessary hashing
-    if (!this.isModified(this.password)) return;
+    // If the password is not modified then return to avoid unnecessary hashing
+    if (!this.isModified("password")) return;
 
     const passwordHash = await bcrypt.hash(this.password, 10);
     this.password = passwordHash;
@@ -40,7 +38,6 @@ userSchema.pre("save", async function (next) {
 
 // hash the password before updating the user
 userSchema.pre("findOneAndUpdate", async function (next) {
-
     // Extract the updated document from this.getUpdate()
     const update: any = this.getUpdate();
 

@@ -33,9 +33,8 @@ const userSchema = new Schema({
 // hash the password before saving the user
 userSchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log("yes");
         // If the password is not modified then return to avoid unnecessary hashing
-        if (!this.isModified(this.password))
+        if (!this.isModified("password"))
             return;
         const passwordHash = yield bcrypt_1.default.hash(this.password, 10);
         this.password = passwordHash;
