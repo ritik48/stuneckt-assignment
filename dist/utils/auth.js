@@ -17,6 +17,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const ApiError_1 = require("./ApiError");
 const user_1 = require("../models/user");
 const JWT_SECRET = process.env.JWT_SECRET || "jwtsecret";
+const JWT_EXPIRY = process.env.JWT_EXPIRY || "24h";
 const isAuthenticated = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     // check if cookie is present in the request
     const cookie = req.cookies.jwt;
@@ -42,7 +43,7 @@ exports.isAuthenticated = isAuthenticated;
 const generateJWTToken = (userId) => {
     try {
         const token = jsonwebtoken_1.default.sign({ id: userId }, JWT_SECRET, {
-            expiresIn: "60s",
+            expiresIn: JWT_EXPIRY,
         });
         return token;
     }

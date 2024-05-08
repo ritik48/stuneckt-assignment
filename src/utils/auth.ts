@@ -5,6 +5,7 @@ import { ApiError } from "./ApiError";
 import { User } from "../models/user";
 
 const JWT_SECRET = process.env.JWT_SECRET || "jwtsecret";
+const JWT_EXPIRY = process.env.JWT_EXPIRY || "24h";
 
 const isAuthenticated = async (
     req: CustomRequest,
@@ -37,7 +38,7 @@ const isAuthenticated = async (
 const generateJWTToken = (userId: string) => {
     try {
         const token = jwt.sign({ id: userId }, JWT_SECRET, {
-            expiresIn: "60s",
+            expiresIn: JWT_EXPIRY,
         });
 
         return token;
