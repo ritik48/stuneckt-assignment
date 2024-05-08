@@ -18,11 +18,25 @@ const ApiError_1 = require("../utils/ApiError");
 const catchError_1 = require("../utils/catchError");
 const user_1 = require("../models/user");
 const post_1 = require("../models/post");
+const auth_1 = require("../utils/auth");
 const router = express_1.default.Router();
 exports.router = router;
 router.get("/", (0, catchError_1.catchError)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const posts = yield post_1.Post.find();
     res.status(200).json({ success: true, posts });
+})));
+router.post("/", (0, catchError_1.catchError)(auth_1.isAuthenticated), (0, catchError_1.catchError)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const { content } = req.body;
+    const newPost = yield post_1.Post.create({
+        content,
+        author: (_a = req.user) === null || _a === void 0 ? void 0 : _a._id,
+    });
+    res.status(201).json({
+        success: true,
+        message: "Post created",
+        post: newPost,
+    });
 })));
 router.get("/:id", (0, catchError_1.catchError)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
