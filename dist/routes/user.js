@@ -65,6 +65,27 @@ router.get("/:id", (0, catchError_1.catchError)((req, res, next) => __awaiter(vo
     }
     res.status(200).json({ success: true, user });
 })));
+router.patch("/", (0, catchError_1.catchError)(auth_1.isAuthenticated), (0, catchError_1.catchError)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const data = req.body;
+    // check if the data is not undefined
+    if (!data) {
+        throw new ApiError_1.ApiError(401, "Please provide the data to update");
+    }
+    // check if the field user want to update is not empty
+    for (let d in data) {
+        if (!data[d]) {
+            throw new ApiError_1.ApiError(401, `${d} cannot be empty`);
+        }
+    }
+    // create a new object with the required updates
+    let update = {};
+    for (let d in data) {
+        update[d] = data[d];
+    }
+    const x = yield user_1.User.findOneAndUpdate({ _id: (_a = req.user) === null || _a === void 0 ? void 0 : _a._id }, update);
+    res.status(201).json({ success: true, message: "User updated" });
+})));
 router.get("/:id/followers", (0, catchError_1.catchError)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const user = yield user_1.User.findById(id);

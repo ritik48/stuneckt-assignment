@@ -98,6 +98,41 @@ router.get(
     )
 );
 
+router.patch(
+    "/",
+    catchError(isAuthenticated),
+    catchError(
+        async (req: CustomRequest, res: Response, next: NextFunction) => {
+            const data = req.body;
+
+            // check if the data is not undefined
+            if (!data) {
+                throw new ApiError(401, "Please provide the data to update");
+            }
+
+            // check if the field user want to update is not empty
+            for (let d in data) {
+                if (!data[d]) {
+                    throw new ApiError(401, `${d} cannot be empty`);
+                }
+            }
+
+            // create a new object with the required updates
+            let update: { [key: string]: string } = {};
+            for (let d in data) {
+                update[d] = data[d];
+            }
+
+            const x = await User.findOneAndUpdate(
+                { _id: req.user?._id },
+                update
+            );
+
+            res.status(201).json({ success: true, message: "User updated" });
+        }
+    )
+);
+
 router.get(
     "/:id/followers",
     catchError(
