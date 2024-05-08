@@ -1,4 +1,4 @@
-import mongoose, { Document } from "mongoose";
+import mongoose, { Document, MongooseError } from "mongoose";
 import bcrypt from "bcrypt";
 import { IUser } from "../types";
 
@@ -27,8 +27,28 @@ const userSchema = new Schema({
 
 // hash the password before saving the user
 userSchema.pre("save", async function (next) {
+    console.log("yes");
+
+   // If the password is not modified then return to avoid unnecessary hashing
+    if (!this.isModified(this.password)) return;
+
     const passwordHash = await bcrypt.hash(this.password, 10);
     this.password = passwordHash;
+
+    next();
+});
+
+// hash the password before updating the user
+userSchema.pre("findOneAndUpdate", async function (next) {
+
+    // Extract the updated document from this.getUpdate()
+    const update: any = this.getUpdate();
+
+    // If the password is not modified then return to avoid unnecessary hashing
+    if (!update?.password) return next();
+
+    const passwordHash = await bcrypt.hash(update.password, 10);
+    update.password = passwordHash;
 
     next();
 });

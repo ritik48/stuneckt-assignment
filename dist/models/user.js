@@ -33,8 +33,25 @@ const userSchema = new Schema({
 // hash the password before saving the user
 userSchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
+        console.log("yes");
+        // If the password is not modified then return to avoid unnecessary hashing
+        if (!this.isModified(this.password))
+            return;
         const passwordHash = yield bcrypt_1.default.hash(this.password, 10);
         this.password = passwordHash;
+        next();
+    });
+});
+// hash the password before updating the user
+userSchema.pre("findOneAndUpdate", function (next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // Extract the updated document from this.getUpdate()
+        const update = this.getUpdate();
+        // If the password is not modified then return to avoid unnecessary hashing
+        if (!(update === null || update === void 0 ? void 0 : update.password))
+            return next();
+        const passwordHash = yield bcrypt_1.default.hash(update.password, 10);
+        update.password = passwordHash;
         next();
     });
 });
