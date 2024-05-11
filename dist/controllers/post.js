@@ -16,8 +16,26 @@ const user_1 = require("../models/user");
 const post_1 = require("../models/post");
 // GET ALL THE POSTS
 const getAllPosts = (0, catchError_1.catchError)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const posts = yield post_1.Post.find().populate("author", "-password");
-    res.status(200).json({ success: true, posts });
+    let page = req.query["page"];
+    let limit = req.query["limit"];
+    let posts;
+    if (!page ||
+        !limit ||
+        isNaN(parseInt(page)) ||
+        page[0] === "-" ||
+        limit[0] === "-" ||
+        isNaN(parseInt(limit))) {
+        posts = yield post_1.Post.find().populate("author", "-password");
+    }
+    else {
+        const offset = (parseInt(page) - 1) * parseInt(limit);
+        posts = yield post_1.Post.find()
+            .skip(offset)
+            .limit(parseInt(limit))
+            .populate("author", "-password");
+    }
+    const totalDocuments = yield post_1.Post.find().countDocuments();
+    res.status(200).json({ success: true, posts, total: totalDocuments });
 }));
 exports.getAllPosts = getAllPosts;
 // CREATE NEW POST
