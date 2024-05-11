@@ -9,8 +9,8 @@ import { Post } from "../models/post";
 // GET ALL THE POSTS
 const getAllPosts = catchError(
     async (req: CustomRequest, res: Response, next: NextFunction) => {
-        let page = req.query["page"] as string | undefined;
-        let limit = req.query["limit"] as string | undefined;
+        let page = (req.query["page"] as string | undefined) ?? "1";
+        let limit = (req.query["limit"] as string | undefined) ?? "2";
 
         let posts;
         if (
@@ -63,7 +63,7 @@ const getPost = catchError(
         if (!user) {
             throw new ApiError(400, "Not a valid user");
         }
-        const posts = await Post.find({ author: user._id });
+        const posts = await Post.find({ author: user._id }).populate("author", "-password");
         res.status(200).json({ success: true, posts });
     }
 );
