@@ -135,9 +135,19 @@ const updateUser = catchError(
             update[d] = data[d];
         }
 
-        const x = await User.findOneAndUpdate({ _id: req.user?._id }, update);
+        const updatedUser = await User.findOneAndUpdate(
+            { _id: req.user?._id },
+            update,
+            {
+                new: true,
+            }
+        );
 
-        res.status(201).json({ success: true, message: "User updated" });
+        res.status(201).json({
+            success: true,
+            message: "User updated",
+            user: updatedUser,
+        });
     }
 );
 
@@ -146,7 +156,7 @@ const getFollowers = catchError(
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const { id } = req.params;
 
-        const user = await User.findById(id);
+        const user = await User.findById(id).populate("followers", "-password");
         if (!user) {
             throw new ApiError(400, "Not a valid user");
         }

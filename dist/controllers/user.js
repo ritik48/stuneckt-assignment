@@ -113,14 +113,20 @@ const updateUser = (0, catchError_1.catchError)((req, res, next) => __awaiter(vo
     for (let d in data) {
         update[d] = data[d];
     }
-    const x = yield user_1.User.findOneAndUpdate({ _id: (_a = req.user) === null || _a === void 0 ? void 0 : _a._id }, update);
-    res.status(201).json({ success: true, message: "User updated" });
+    const updatedUser = yield user_1.User.findOneAndUpdate({ _id: (_a = req.user) === null || _a === void 0 ? void 0 : _a._id }, update, {
+        new: true,
+    });
+    res.status(201).json({
+        success: true,
+        message: "User updated",
+        user: updatedUser,
+    });
 }));
 exports.updateUser = updateUser;
 // GET FOLLOWERS OF A USER
 const getFollowers = (0, catchError_1.catchError)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const user = yield user_1.User.findById(id);
+    const user = yield user_1.User.findById(id).populate("followers", "-password");
     if (!user) {
         throw new ApiError_1.ApiError(400, "Not a valid user");
     }
