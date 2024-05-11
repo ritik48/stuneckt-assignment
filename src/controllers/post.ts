@@ -9,7 +9,7 @@ import { Post } from "../models/post";
 // GET ALL THE POSTS
 const getAllPosts = catchError(
     async (req: CustomRequest, res: Response, next: NextFunction) => {
-        const posts = await Post.find();
+        const posts = await Post.find().populate("author", "-password");
         res.status(200).json({ success: true, posts });
     }
 );

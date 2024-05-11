@@ -16,7 +16,7 @@ const user_1 = require("../models/user");
 const post_1 = require("../models/post");
 // GET ALL THE POSTS
 const getAllPosts = (0, catchError_1.catchError)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const posts = yield post_1.Post.find();
+    const posts = yield post_1.Post.find().populate("author", "-password");
     res.status(200).json({ success: true, posts });
 }));
 exports.getAllPosts = getAllPosts;
