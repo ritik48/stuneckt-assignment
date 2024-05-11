@@ -50,7 +50,7 @@ const createPost = (0, catchError_1.catchError)((req, res, next) => __awaiter(vo
     res.status(201).json({
         success: true,
         message: "Post created",
-        post: newPost,
+        post: Object.assign(Object.assign({}, newPost), { author: req.user }),
     });
 }));
 exports.createPost = createPost;
