@@ -49,7 +49,7 @@ const createPost = catchError(
         res.status(201).json({
             success: true,
             message: "Post created",
-            post: newPost,
+            post: { ...newPost, author: req.user },
         });
     }
 );
@@ -63,7 +63,10 @@ const getPost = catchError(
         if (!user) {
             throw new ApiError(400, "Not a valid user");
         }
-        const posts = await Post.find({ author: user._id }).populate("author", "-password");
+        const posts = await Post.find({ author: user._id }).populate(
+            "author",
+            "-password"
+        );
         res.status(200).json({ success: true, posts });
     }
 );
