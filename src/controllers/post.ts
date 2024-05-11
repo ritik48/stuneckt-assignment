@@ -46,10 +46,11 @@ const createPost = catchError(
             author: req.user?._id,
         });
 
+        const dataToSend = newPost.toJSON();
         res.status(201).json({
             success: true,
             message: "Post created",
-            post: { ...newPost, author: req.user },
+            post: { ...dataToSend, author: req.user },
         });
     }
 );

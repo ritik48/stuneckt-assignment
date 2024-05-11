@@ -47,10 +47,11 @@ const createPost = (0, catchError_1.catchError)((req, res, next) => __awaiter(vo
         content,
         author: (_c = req.user) === null || _c === void 0 ? void 0 : _c._id,
     });
+    const dataToSend = newPost.toJSON();
     res.status(201).json({
         success: true,
         message: "Post created",
-        post: Object.assign(Object.assign({}, newPost), { author: req.user }),
+        post: Object.assign(Object.assign({}, dataToSend), { author: req.user }),
     });
 }));
 exports.createPost = createPost;
