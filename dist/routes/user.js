@@ -14,5 +14,6 @@ router.get("/", (0, catchError_1.catchError)(auth_1.isAuthenticated), user_1.get
 router.patch("/", (0, catchError_1.catchError)(auth_1.isAuthenticated), user_1.updateUser);
 router.post("/login", user_1.userLogin);
 router.post("/signup", user_1.userSignup);
+router.post("/logout", (0, catchError_1.catchError)(auth_1.isAuthenticated), user_1.userLogout);
 router.get("/:id", user_1.getUser);
 router.get("/:id/followers", user_1.getFollowers);

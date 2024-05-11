@@ -9,7 +9,7 @@ import { generateJWTToken } from "../utils/auth";
 // GET CURRENT LOGGED IN USE
 const getCurrentUser = catchError(
     async (req: CustomRequest, res: Response, next: NextFunction) => {
-        res.status(200).json({ status: true, user: req.user });
+        res.status(200).json({ success: true, user: req.user });
     }
 );
 
@@ -47,8 +47,16 @@ const userLogin = catchError(
 
         const jwtToken = generateJWTToken(user._id);
 
-        res.cookie("jwt", jwtToken);
-        res.status(200).json({ success: true, message: "User logged in" });
+        res.cookie("jwt", jwtToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+        });
+        res.status(200).json({
+            success: true,
+            message: "User logged in",
+            user,
+        });
     }
 );
 
@@ -72,10 +80,34 @@ const userSignup = catchError(
 
         const newUser = await User.create({ username, password });
 
+        const jwtToken = generateJWTToken(newUser._id);
+
+        res.cookie("jwt", jwtToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+        });
+
         res.status(200).json({
             success: true,
             message: "Account created successfully",
             user: newUser,
+        });
+    }
+);
+
+// CREATE NEW USER
+const userLogout = catchError(
+    async (req: CustomRequest, res: Response, next: NextFunction) => {
+        req.user = null;
+        res.clearCookie("jwt", {
+            secure: true,
+            httpOnly: true,
+            sameSite: "none",
+        });
+        res.status(200).json({
+            success: true,
+            message: "User logged out",
         });
     }
 );
@@ -129,4 +161,5 @@ export {
     getCurrentUser,
     updateUser,
     getFollowers,
+    userLogout,
 };

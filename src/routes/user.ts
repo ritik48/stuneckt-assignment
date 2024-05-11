@@ -9,6 +9,7 @@ import {
     userSignup,
     updateUser,
     getFollowers,
+    userLogout,
 } from "../controllers/user";
 
 const router = express.Router();
@@ -17,6 +18,7 @@ router.get("/", catchError(isAuthenticated), getCurrentUser);
 router.patch("/", catchError(isAuthenticated), updateUser);
 router.post("/login", userLogin);
 router.post("/signup", userSignup);
+router.post("/logout", catchError(isAuthenticated), userLogout);
 router.get("/:id", getUser);
 router.get("/:id/followers", getFollowers);
 

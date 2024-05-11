@@ -8,7 +8,7 @@ interface IUser {
 
 // Custom Request to add user property in the Request after authentication
 interface CustomRequest extends Request {
-    user?: Document;
+    user?: Document | null;
 }
 
 export { IUser, CustomRequest };

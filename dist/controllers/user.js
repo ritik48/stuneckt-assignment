@@ -9,14 +9,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getFollowers = exports.updateUser = exports.getCurrentUser = exports.getUser = exports.userSignup = exports.userLogin = void 0;
+exports.userLogout = exports.getFollowers = exports.updateUser = exports.getCurrentUser = exports.getUser = exports.userSignup = exports.userLogin = void 0;
 const ApiError_1 = require("../utils/ApiError");
 const catchError_1 = require("../utils/catchError");
 const user_1 = require("../models/user");
 const auth_1 = require("../utils/auth");
 // GET CURRENT LOGGED IN USE
 const getCurrentUser = (0, catchError_1.catchError)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    res.status(200).json({ status: true, user: req.user });
+    res.status(200).json({ success: true, user: req.user });
 }));
 exports.getCurrentUser = getCurrentUser;
 // GET ANY USER BY ID
@@ -44,8 +44,16 @@ const userLogin = (0, catchError_1.catchError)((req, res, next) => __awaiter(voi
         throw new ApiError_1.ApiError(400, "Invalid credentials");
     }
     const jwtToken = (0, auth_1.generateJWTToken)(user._id);
-    res.cookie("jwt", jwtToken);
-    res.status(200).json({ success: true, message: "User logged in" });
+    res.cookie("jwt", jwtToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+    });
+    res.status(200).json({
+        success: true,
+        message: "User logged in",
+        user,
+    });
 }));
 exports.userLogin = userLogin;
 // CREATE NEW USER
@@ -59,6 +67,12 @@ const userSignup = (0, catchError_1.catchError)((req, res, next) => __awaiter(vo
         throw new ApiError_1.ApiError(400, "Username already taken. Choose something else.");
     }
     const newUser = yield user_1.User.create({ username, password });
+    const jwtToken = (0, auth_1.generateJWTToken)(newUser._id);
+    res.cookie("jwt", jwtToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+    });
     res.status(200).json({
         success: true,
         message: "Account created successfully",
@@ -66,6 +80,20 @@ const userSignup = (0, catchError_1.catchError)((req, res, next) => __awaiter(vo
     });
 }));
 exports.userSignup = userSignup;
+// CREATE NEW USER
+const userLogout = (0, catchError_1.catchError)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    req.user = null;
+    res.clearCookie("jwt", {
+        secure: true,
+        httpOnly: true,
+        sameSite: "none",
+    });
+    res.status(200).json({
+        success: true,
+        message: "User logged out",
+    });
+}));
+exports.userLogout = userLogout;
 // UPDATE USER DETAILS
 const updateUser = (0, catchError_1.catchError)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
